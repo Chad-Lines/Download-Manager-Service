@@ -36,20 +36,55 @@ public class FileOrganizer
         // Returns the name of the file sans the path (e.x. "Example.txt")
         string fileName = e.Name;
 
-        // Make sure the file name is not null. If it is, return
-        if (fileName == null) return;
+        // Try...
+        try
+        {
+            // Make sure the file name is not null. If it is, return
+            if (fileName == null) return;
 
-        // Check if the filename has the an extension matching those defined. If so, then we
-        // set the destination path accordingly        
-        else if (_docExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirDocuments, fileName);
-        else if (_musicExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirMusic, fileName);
-        else if (_vidExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirVideos, fileName);
-        else if (_pictureExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirPictures, fileName);
+            // Check if the filename has the an extension matching those defined. If so, then we
+            // set the destination path accordingly        
+            else if (_docExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirDocuments, fileName);
+            else if (_musicExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirMusic, fileName);
+            else if (_vidExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirVideos, fileName);
+            else if (_pictureExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirPictures, fileName);
 
-        // If the file extension isn't found, just return
-        else return;
+            // If the file extension isn't found, just return
+            else return;
 
-        // Move the file
-        File.Move(e.FullPath, fullDestPath);
+            // Call the MoveFile method
+            MoveFile(e, fullDestPath);
+        }
+        // If the above fails for any reason...
+        catch (Exception ex)
+        {
+            // Log the error
+            LogFailure(ex);
+        }        
     }    
+
+    static void MoveFile(FileSystemEventArgs e, string fullDestPath)
+    {
+        try
+        {
+            // Move the file
+            File.Move(e.FullPath, fullDestPath);
+
+            // Log the successful operations
+            Log.Add($"{e.Name} moved to {fullDestPath}.", "Success");
+        }
+        catch (Exception ex)
+        {
+            // Log the error
+            LogFailure(ex);
+        }
+
+    }
+
+    static void LogFailure(Exception ex)
+    {
+        // Send the error to the log
+        Log.Add(ex.ToString(), "Error");
+    }
+    
 }
