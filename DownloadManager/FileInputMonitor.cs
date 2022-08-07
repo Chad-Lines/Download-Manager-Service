@@ -1,20 +1,27 @@
 ﻿namespace DownloadManager;
 
-public class FileInputMonitor
+public class FileOrganizer
 {
-    // Defining the source and destination directories
-    static string _sourceDir = @"C:\Users\chadl\Downloads";
-    static string _destDirDocuments = @"C:\Users\chadl\Documents";
-    static string _destDirMusic = @"C:\Users\chadl\Music";
-    static string _destDirPictures = @"C:\Users\chadl\Pictures";
-    static string _destDirVideos = @"C:\Users\chadl\Videos";
+    // Defining the source directory
+    static string _sourceDir = @"C:\Users\chadl\Organize";
+    
+    // Defining the destination directories
+    static string _dirDocuments = @"C:\Users\chadl\Actual Documents";
+    static string _dirMusic = @"C:\Users\chadl\Music";
+    static string _dirPictures = @"C:\Users\chadl\Pictures";
+    static string _dirVideos = @"C:\Users\chadl\Videos";
+
+    // Defining the extensions for the various file types
+    static string[] _docExtensions = { "xlsx", ".pdf", "docx", ".txt", ".csv" };
+    static string[] _musicExtensions = { ".mp3", "flac", ".ogg" };
+    static string[] _vidExtensions = { ".mp4", ".avi", ".mov", ".flv", ".mkv", "webm" };
+    static string[] _pictureExtensions = { ".jpg", "jpeg", ".png", ".bmp", ".gif", ".svg" };
 
     // The FileSystemWatcher enables us to monitor changes to a (the source) folder
     private static FileSystemWatcher _fsw;
 
-    public FileInputMonitor()
+    public FileOrganizer()
     {
-        Console.WriteLine("FileInputMonitor Called");
         _fsw = new FileSystemWatcher(_sourceDir);                // Tell the fsw to watch the source folder
         _fsw.EnableRaisingEvents = true;                         // This allows us to raise events based on changes to the source folder
         _fsw.Created += new FileSystemEventHandler(ProcessFiles); // When a new file shows up, call the FileCreated method
@@ -22,38 +29,27 @@ public class FileInputMonitor
 
     static void ProcessFiles(Object sender, FileSystemEventArgs e)
     {
-        Console.WriteLine("ProcessFiles Called");
+        // This will hold the full destination path (e.x. "C:\Users\chadl\Documents\Example.txt")
+        // This format is required by the File.Move method
+        string fullDestPath;
 
+        // Returns the name of the file sans the path (e.x. "Example.txt")
         string fileName = e.Name;
 
-        // Defining the extensions for the various file types
-        string[] docExtensions = { "xlsx", ".pdf", "docx", ".txt", ".csv" };
-        string[] musicExtensions = { ".mp3", "flac", ".ogg" };                      
-        string[] vidExtensions = { ".mp4", ".avi", ".mov", ".flv", ".mkv", "webm" };                                        
-        string[] pictureExtensions = { ".jpg", "jpeg", ".png", ".bmp", ".gif" };
+        // Make sure the file name is not null. If it is, return
+        if (fileName == null) return;
 
-        if (docExtensions.Any(fileName.Contains))
-        {
-            _destDirDocuments += string.Concat(@"\", fileName);
-            File.Move(e.FullPath, _destDirDocuments);
-            Console.Write(e.FullPath + _destDirDocuments);
-        }
+        // Check if the filename has the an extension matching those defined. If so, then we
+        // set the destination path accordingly        
+        else if (_docExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirDocuments, fileName);
+        else if (_musicExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirMusic, fileName);
+        else if (_vidExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirVideos, fileName);
+        else if (_pictureExtensions.Any(fileName.Contains)) fullDestPath = Path.Combine(_dirPictures, fileName);
 
+        // If the file extension isn't found, just return
+        else return;
 
-        // Get a list of files in the source directory
-        //string[] srcFiles = Directory.GetFiles(_sourceDir);
-
-        // Iterate through the files
-        //foreach (string f in srcFiles)
-        //{
-        //    Console.WriteLine(f);
-
-        //    // Based on the file extension, move it to the destination folder
-        //    if (docExtensions.Any(f.Contains)){ File.Move(f, string.Concat(_destDirDocuments);
-        //    else if (musicExtensions.Any(f.Contains)) File.Move(f, _destDirMusic);
-        //    else if (pictureExtensions.Any(f.Contains)) File.Move(f, _destDirPictures);
-        //    else if (vidExtensions.Any(f.Contains)) File.Move(f, _destDirVideos);
-        //    else Console.WriteLine("No files found to move.");
-        //}        
-    }
+        // Move the file
+        File.Move(e.FullPath, fullDestPath);
+    }    
 }

@@ -3,8 +3,8 @@
 internal class Program
 {
     static void Main(string[] args)
-    { 
-        FileInputMonitor processor = new FileInputMonitor();
+    {
+        FileOrganizer processor = new FileOrganizer();
         Console.Read();
     }
 }

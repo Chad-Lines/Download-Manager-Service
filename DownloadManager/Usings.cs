@@ -5,3 +5,4 @@ global using System.Text;
 global using System.Threading.Tasks;
 global using System.IO;
 global using DownloadManager;
+global using System.Threading;
