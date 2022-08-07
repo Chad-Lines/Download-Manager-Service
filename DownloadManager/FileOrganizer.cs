@@ -86,5 +86,4 @@ public class FileOrganizer
         // Send the error to the log
         Log.Add(ex.ToString(), "Error");
     }
-    
 }
